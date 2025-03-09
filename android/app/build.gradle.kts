@@ -1,18 +1,18 @@
 plugins {
     id("com.android.application")
     id("kotlin-android")
-    id("dev.flutter.flutter-gradle-plugin") // Must be after Android and Kotlin plugins
-    id("com.google.gms.google-services") // Firebase plugin
+    id("dev.flutter.flutter-gradle-plugin")
+    id("com.google.gms.google-services")
 }
 
 android {
     namespace = "com.manmohan.pcbuilder"
-    compileSdk = 34 // Change to the latest version
+    compileSdk = 34
 
     defaultConfig {
         applicationId = "com.manmohan.pcbuilder"
         minSdk = 23
-        targetSdk = 34 // Make sure it's the latest
+        targetSdk = 34
         versionCode = 1
         versionName = "1.0"
     }
@@ -20,6 +20,8 @@ android {
     buildTypes {
         release {
             signingConfig = signingConfigs.getByName("debug")
+            isMinifyEnabled = false
+            isShrinkResources = false
         }
     }
 
