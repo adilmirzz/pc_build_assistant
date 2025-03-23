@@ -7,12 +7,12 @@ plugins {
 
 android {
     namespace = "com.manmohan.pcbuilder"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.manmohan.pcbuilder"
         minSdk = 23
-        targetSdk = 34
+        targetSdk = 35
         versionCode = 1
         versionName = "1.0"
     }
