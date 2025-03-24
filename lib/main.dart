@@ -2,46 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
+import 'package:provider/provider.dart';
+import 'models/user_selection.dart';
+import 'models/pc_part.dart';
+import 'screens/selection_summary_screen.dart';
+
+
 //this is my main.dart file
 
-class PCPart {
-  final String name;
-  final String category;
-  final double price;
-  final String brand;
-  final String formFactor;
-  final bool rgb;
-  final String sidePanel;
-  final String type;
-  final Map<String, dynamic> additionalFields;
 
-  PCPart({
-    required this.name,
-    required this.category,
-    required this.price,
-    required this.brand,
-    required this.formFactor,
-    required this.rgb,
-    required this.sidePanel,
-    required this.type,
-    required this.additionalFields,
-  });
-
-  factory PCPart.fromFirestore(DocumentSnapshot doc) {
-    final data = doc.data() as Map<String, dynamic>;
-    return PCPart(
-      name: data['name'] ?? '',
-      category: data['category'] ?? '',
-      price: data['price']?.toDouble() ?? 0.0,
-      brand: data['brand'] ?? '',
-      formFactor: data['form_factor'] ?? '',
-      rgb: data['rgb'] ?? false,
-      sidePanel: data['side_panel'] ?? '',
-      type: data['type'] ?? '',
-      additionalFields: Map<String, dynamic>.from(data),
-    );
-  }
-}
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   try {
@@ -52,9 +21,14 @@ void main() async {
   } catch (e) {
     print('Error initializing Firebase: $e');
   }
-  runApp(const MyApp());
-}
 
+  runApp(
+    ChangeNotifierProvider(
+      create: (_) => UserSelection(),
+      child: const MyApp(),
+    ),
+  );
+}
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
@@ -88,22 +62,32 @@ class _PCPartsScreenState extends State<PCPartsScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('PC Parts Picker'),
-        actions: [
-          DropdownButton<String>(
-            value: selectedCategory,
-            onChanged: (value) {
-              setState(() {
-                selectedCategory = value!;
-              });
-            },
-            items: categories.map((category) {
-              return DropdownMenuItem<String>(
-                value: category,
-                child: Text(category),
-              );
-            }).toList(),
-          ),
-        ],
+       actions: [
+                  DropdownButton<String>(
+                    value: selectedCategory,
+                    onChanged: (value) {
+                      setState(() {
+                        selectedCategory = value!;
+                      });
+                    },
+                    items: categories.map((category) {
+                      return DropdownMenuItem<String>(
+                        value: category,
+                        child: Text(category),
+                      );
+                    }).toList(),
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.checklist),
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => const SelectionSummaryScreen()),
+                      );
+                    },
+                  ),
+                ],
+
       ),
       body: StreamBuilder<QuerySnapshot>(
         stream: firestore.collection(selectedCategory).snapshots(),
@@ -132,7 +116,20 @@ class _PCPartsScreenState extends State<PCPartsScreen> {
                   child: ListTile(
                     title: Text(part.name, style: const TextStyle(fontWeight: FontWeight.bold)),
                     subtitle: Text('${part.category} - ₹${part.price.toStringAsFixed(2)}'),
-                    onTap: () => showDetails(context, part),
+                   onTap: () {
+                              final userSelection = Provider.of<UserSelection>(context, listen: false);
+                              if (userSelection.isPartCompatible(selectedCategory, part)) {
+                                userSelection.selectPart(selectedCategory, part);
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(content: Text('${part.name} selected for $selectedCategory')),
+                                );
+                              } else {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(content: Text('${part.name} is not compatible with the selected parts.')),
+                                );
+                              }
+                                showDetails(context, part);
+                              },
                   ),
                 );
               },
