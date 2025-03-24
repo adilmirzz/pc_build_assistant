@@ -1,6 +1,7 @@
 {
   "project_info": {
     "project_number": "976720855178",
+    "firebase_url": "https://pc-12311-default-rtdb.firebaseio.com",
     "project_id": "pc-12311",
     "storage_bucket": "pc-12311.firebasestorage.app"
   },
@@ -10,6 +11,25 @@
         "mobilesdk_app_id": "1:976720855178:android:e834eef8e4c6e048c5ed73",
         "android_client_info": {
           "package_name": "com.manmohan.pcbuilder"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCiGzFx0HOVx9oyNDIdMg9S2CxFBRFC3JQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:976720855178:android:81d5e9671c2371cec5ed73",
+        "android_client_info": {
+          "package_name": "com.nuvon.pcbuilder"
         }
       },
       "oauth_client": [],

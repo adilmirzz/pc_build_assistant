@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
+//this is my main.dart file
 
 class PCPart {
   final String name;
@@ -36,16 +38,23 @@ class PCPart {
       rgb: data['rgb'] ?? false,
       sidePanel: data['side_panel'] ?? '',
       type: data['type'] ?? '',
-      additionalFields: data,
+      additionalFields: Map<String, dynamic>.from(data),
     );
   }
 }
-
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp();
+  try {
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
+    print('Firebase initialized successfully');
+  } catch (e) {
+    print('Error initializing Firebase: $e');
+  }
   runApp(const MyApp());
 }
+
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
@@ -104,13 +113,14 @@ class _PCPartsScreenState extends State<PCPartsScreen> {
           }
           if (snapshot.hasError) {
             print('Snapshot error: ${snapshot.error}');
-            return Center(child: Text('Error: ${snapshot.error}'));
+            return Center(child: Text('❗ Error: ${snapshot.error}'));
           }
+
           try {
             final parts = snapshot.data?.docs.map((doc) => PCPart.fromFirestore(doc)).toList() ?? [];
 
             if (parts.isEmpty) {
-              return const Center(child: Text('No parts available'));
+              return Center(child: Text('🛑 No parts available in $selectedCategory'));
             }
 
             return ListView.builder(
@@ -128,7 +138,7 @@ class _PCPartsScreenState extends State<PCPartsScreen> {
               },
             );
           } catch (e) {
-            print('Error: $e');
+            print('❗ Error during data mapping: $e');
             return Center(child: Text('Error: $e'));
           }
         },
